@@ -90,7 +90,11 @@
 					<td style="height: 50px; width: {w}px" class="border-b bg-green-500" colspan="3">آمار و احتمال مهندسی</td>
 					<td style="height: 50px; width: {w}px" class="border-l border-b hidden">08:00</td>
 					<td style="height: 50px; width: {w}px" class="border-b hidden"></td>
-					<td style="height: 50px; width: {w}px"class="border-l border-b bg-red-500" colspan="3">09:00</td><!--9-->
+					<td style="height: 50px; width: {w}px"class="border-l border-b" colspan="3">
+						<div class="bg-red-700">معادلات دیفرانسیل</div>
+						<div class="bg-red-300">جبرخطی عددی</div>
+						<div class="bg-red-500">بهینه سازی غیرخطی</div>
+					</td><!--9-->
 					<td style="height: 50px; width: {w}px" class="border-b hidden"></td>
 					<td style="height: 50px; width: {w}px" class="border-l border-b hidden">10:00</td>
 					<td style="height: 50px; width: {w}px" class="border-b"></td>
