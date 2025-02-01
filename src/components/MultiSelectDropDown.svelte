@@ -12,18 +12,18 @@
     }));
 </script>
 
-<div class="relative inline-block group z-30" dir="rtl">
+<div class="relative inline-block group z-30" style="width: 100%;" dir="rtl">
 
     <input
         type="text"
         placeholder="همه دانشکده ها..."
         bind:value={search_term}
         onclick={toggle_dropdown}
-        style="width: 300px;"
-        class="px-4 py-2 bg-green-500 text-white rounded-md focus:outline-none"
+        style="width: 100%;"
+        class="px-4 py-2 bg-green-500 placeholder-gray-200 text-white rounded-md focus:outline-none"
     />
     <div
-        style="width: 300px;max-height: 500px;"
+        style="width: 100%;max-height: 500px;"
         class="absolute hidden bg-yellow-700 shadow-md rounded-md w-48 mt-0 p-2 z-10 overflow-y-auto"
         class:block={is_dropdown_open}
         class:hidden={!is_dropdown_open}

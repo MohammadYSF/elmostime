@@ -6,8 +6,7 @@
 	let flat_data = $state([]);
 	let original_data = $state([]);
 	let error = $state("NO_ERROR");
-	let selected_courses = $state([
-	]);
+	let selected_courses = $state([]);
 	async function fetch_data() {
 		try {
 			const response = await axios.get("http://127.0.0.1:5000/data");
@@ -21,7 +20,7 @@
 		}
 	}
 	const W = 45;
-	const DEFAULT_Z_INDEX=10;
+	const DEFAULT_Z_INDEX = 10;
 	fetch_data();
 
 	const TIMES = [
@@ -84,74 +83,90 @@
 	}
 	let mouse_entered_id = $state("");
 </script>
-<div class="max-w-xs mx-auto">
-<MultiSelectDropDown options={flat_data}  bind:selectedItems={selected_courses}/>
 
-</div>
-
-
-<div class="background" style="background-image: url({bgImage});">
-	<table class="w-full" style="table-layout: fixed;" dir="rtl">
-		<thead>
-			<tr>
-				<th style="width:{W + 40}px;" class="border-b text-right">#</th>
-				{#each TIMES as t, i}
-					<th
-						style="width:{W}px;"
-						class="border-b {i % 2 == 0
-							? 'text-rtl relative'
-							: 'invisible'}"
-					>
-						{#if i % 2 == 0}
-							<span class="absolute top-0 -right-2">
-								{toPersianNumbers(t.substring(0, 2))}
-							</span>
-						{/if}
-					</th>
-				{/each}
-			</tr>
-		</thead>
-		<tbody>
-			{#each WEEK_DAYS as item, _}
+<div class="grid grid-cols-4" dir="rtl">
+	<div class="col-span-4 md:col-span-1">
+		<div class="" style="width: 100%;">
+			<MultiSelectDropDown
+				options={flat_data}
+				bind:selectedItems={selected_courses}
+			/>
+		</div>
+	</div>
+	<div class="col-span-4 md:col-span-3">
+		<table class="w-full" style="table-layout: fixed;" dir="rtl">
+			<thead>
 				<tr>
-					<td style="height: 50px;" class="border-b"
-						>{PERSIAN_WEEKDAY_MAP.get(item)}</td
+					<th style="width:{W + 40}px;" class="border-b text-right"
+						>#</th
 					>
 					{#each TIMES as t, i}
-						{#if filtered_data.filter((a) => a.lecture_schedules.findIndex((b) => b.start_time == t && b.day_of_week == item) != -1).length > 0}
-							<td
-								style="height: 50px; width: {W}px"
-								class="border-b"
-							>
-								{#each filtered_data.filter((a) => a.lecture_schedules.findIndex((b) => b.start_time == t && b.day_of_week == item) != -1) as c, j}
-									<div
-										onmouseenter={() =>{mouse_entered_id = c.course_number_and_group}}
-										onmouseleave={() => mouse_entered_id = ""}
-										onclick={() =>
-											remove_course(
-												c.course_number_and_group,
-											)}
-										class="cursor-pointer inline-block {mouse_entered_id == c.course_number_and_group ? `bg-red-700 z-${DEFAULT_Z_INDEX+10}`:`bg-green-700 z-${DEFAULT_Z_INDEX}`} relative {j >
-										0
-											? 'border-t'
-											: ''}"
-										style="width: {3 * W}px"
-									>
-										{toPersianNumbers(c.course_name)}
-									</div>
-								{/each}
-							</td>
-						{:else}
-							<td
-								style="height: 50px; width: {W}px"
-								class="border-b {i % 2 == 0 ? 'border-r' : ''}"
-							></td>
-						{/if}
+						<th
+							style="width:{W}px;"
+							class="border-b {i % 2 == 0
+								? 'text-rtl relative'
+								: 'invisible'}"
+						>
+							{#if i % 2 == 0}
+								<span class="absolute top-0 -right-2">
+									{toPersianNumbers(t.substring(0, 2))}
+								</span>
+							{/if}
+						</th>
 					{/each}
 				</tr>
-			{/each}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				{#each WEEK_DAYS as item, _}
+					<tr>
+						<td style="height: 50px;" class="border-b"
+							>{PERSIAN_WEEKDAY_MAP.get(item)}</td
+						>
+						{#each TIMES as t, i}
+							{#if filtered_data.filter((a) => a.lecture_schedules.findIndex((b) => b.start_time == t && b.day_of_week == item) != -1).length > 0}
+								<td
+									style="height: 50px; width: {W}px"
+									class="border-b"
+								>
+									{#each filtered_data.filter((a) => a.lecture_schedules.findIndex((b) => b.start_time == t && b.day_of_week == item) != -1) as c, j}
+										<div
+											onmouseenter={() => {
+												mouse_entered_id =
+													c.course_number_and_group;
+											}}
+											onmouseleave={() =>
+												(mouse_entered_id = "")}
+											onclick={() =>
+												remove_course(
+													c.course_number_and_group,
+												)}
+											class="cursor-pointer inline-block {mouse_entered_id ==
+											c.course_number_and_group
+												? `bg-red-700 z-${DEFAULT_Z_INDEX + 10}`
+												: `bg-green-700 z-${DEFAULT_Z_INDEX}`} relative {j >
+											0
+												? 'border-t'
+												: ''}"
+											style="width: {3 * W}px"
+										>
+											{toPersianNumbers(c.course_name)}
+										</div>
+									{/each}
+								</td>
+							{:else}
+								<td
+									style="height: 50px; width: {W}px"
+									class="border-b {i % 2 == 0
+										? 'border-r'
+										: ''}"
+								></td>
+							{/if}
+						{/each}
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</div>
 </div>
 
 <style>

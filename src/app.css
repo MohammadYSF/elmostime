@@ -41,10 +41,14 @@ h1 {
 }
 
 #app {
-  max-width: 1280px;
+  /* max-width: 1280px; */
+  background-image: url('./assets/bg5.jpg');
+  background-size: cover;
+  background-position: center;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  height: 100vh;
 }
 
 button {
