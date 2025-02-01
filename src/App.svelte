@@ -3,6 +3,7 @@
 	import axios from "axios";
 	import { onMount } from "svelte";
 	import MultiSelectDropDown from "./components/MultiSelectDropDown.svelte";
+	import { toPersianNumbers } from "./lib/helpers";
 	let flat_data = $state([]);
 	let original_data = $state([]);
 	let error = $state("NO_ERROR");
@@ -19,6 +20,7 @@
 			error = err.message;
 		}
 	}
+	let user_department = $state("ARCHITECTURE_ENG");
 	const W = 45;
 	const DEFAULT_Z_INDEX = 10;
 	fetch_data();
@@ -65,17 +67,31 @@
 	PERSIAN_WEEKDAY_MAP.set("TUESDAY", "سه شنبه");
 	PERSIAN_WEEKDAY_MAP.set("WEDNESDAY", "چهارشنبه");
 	PERSIAN_WEEKDAY_MAP.set("THURSDAY", "پنجشنبه");
-
+	const DEPARTMENT_NAMES_MAP = new Map();
+	DEPARTMENT_NAMES_MAP.set("ELECTRICAL_ENG","برق");
+	DEPARTMENT_NAMES_MAP.set("RAILWAY_ENG","راه آهن");
+	DEPARTMENT_NAMES_MAP.set("INDUSTRIAL_ENG","صنایع");
+	DEPARTMENT_NAMES_MAP.set("PHYSICS","فیزیک");
+	DEPARTMENT_NAMES_MAP.set("METALOGY_ENG","مواد");
+	DEPARTMENT_NAMES_MAP.set("ARCHITECTURE_ENG","معماری");
+	DEPARTMENT_NAMES_MAP.set("MECHANICAL_ENG","مکانیک");
+	DEPARTMENT_NAMES_MAP.set("CHEMICAL_ENG","م شیمی");
+	DEPARTMENT_NAMES_MAP.set("CIVIL_ENG","عمران");
+	DEPARTMENT_NAMES_MAP.set("COMPUTER_ENG","کامپیوتر");
+	DEPARTMENT_NAMES_MAP.set("PHYSICALEDU","تربیت بدنی");
+	DEPARTMENT_NAMES_MAP.set("ISLAMICEDU","معارف");
+	DEPARTMENT_NAMES_MAP.set("CHEMISTRY","شیمی");
+	DEPARTMENT_NAMES_MAP.set("MANAGEMENT","مدیریت");
+	DEPARTMENT_NAMES_MAP.set("NOOR","واحد نور");
+	DEPARTMENT_NAMES_MAP.set("PARDIS","پردیس");
+	DEPARTMENT_NAMES_MAP.set("GENERAL","سایر");
 	let filtered_data = $derived(
 		flat_data.filter((a) =>
 			selected_courses.includes(a.course_number_and_group),
 		),
 	);
 
-	function toPersianNumbers(num) {
-		const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
-		return num.toString().replace(/\d/g, (d) => persianDigits[d]);
-	}
+
 	onMount(fetch_data);
 
 	function remove_course(id) {
@@ -88,13 +104,44 @@
 	<div class="col-span-4 md:col-span-1">
 		<div class="" style="width: 100%;">
 			<MultiSelectDropDown
+				additionalClass="mb-3"
+				title="همه دانشکده ها ..."
 				options={flat_data}
+				bind:selectedItems={selected_courses}
+			/>
+			<MultiSelectDropDown
+				additionalClass="mb-3"
+				title="{DEPARTMENT_NAMES_MAP.get("ISLAMICEDU")} ..."				
+				options={flat_data.filter((a) => a.category == "ISLAMICEDU")}
+				bind:selectedItems={selected_courses}
+			/>
+			<MultiSelectDropDown
+				additionalClass="mb-3"
+				title="{DEPARTMENT_NAMES_MAP.get("PHYSICALEDU")} ..."				
+				options={flat_data.filter((a) => a.category == "PHYSICALEDU")}
+				bind:selectedItems={selected_courses}
+			/>
+			<MultiSelectDropDown
+				additionalClass="mb-3"
+				title="ریاضی ..."
+				options={flat_data.filter((a) => a.category == "MATH")}
+				bind:selectedItems={selected_courses}
+			/>
+			<MultiSelectDropDown
+				additionalClass="mb-3"
+				title="{DEPARTMENT_NAMES_MAP.get("PHYSICS")} ..."
+				options={flat_data.filter((a) => a.category == "PHYSICS")}
+				bind:selectedItems={selected_courses}
+			/>
+			<MultiSelectDropDown
+				title="دانشکده شما : {DEPARTMENT_NAMES_MAP.get(user_department)} ..."
+				options={flat_data.filter((a) => a.category == "ISLAMICEDU")}
 				bind:selectedItems={selected_courses}
 			/>
 		</div>
 	</div>
 	<div class="col-span-4 md:col-span-3">
-		<table class="w-full" style="table-layout: fixed;" dir="rtl">
+		<table class="w-full" style="table-layout: fixed; height: 450px;" dir="rtl">
 			<thead>
 				<tr>
 					<th style="width:{W + 40}px;" class="border-b text-right"

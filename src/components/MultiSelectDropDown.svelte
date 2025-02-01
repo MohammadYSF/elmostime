@@ -1,6 +1,7 @@
 <!-- MultiSelectDropdown.svelte -->
 <script>
-    let {options=[],selectedItems=$bindable([])} = $props();
+    import { toPersianNumbers } from "../lib/helpers";
+    let {options=[],selectedItems=$bindable([]),title="...",additionalClass=""} = $props();
     let search_term = $state("");
     let is_dropdown_open = $state(false);
     const toggle_dropdown = () => {
@@ -12,11 +13,11 @@
     }));
 </script>
 
-<div class="relative inline-block group z-30" style="width: 100%;" dir="rtl">
+<div class="relative inline-block group {additionalClass}" style="width: 100%;" dir="rtl">
 
     <input
         type="text"
-        placeholder="همه دانشکده ها..."
+        placeholder={title}
         bind:value={search_term}
         onclick={toggle_dropdown}
         style="width: 100%;"
@@ -36,7 +37,7 @@
                     value={option.course_number_and_group}
                     class="w-6 h-6 text-green-500 focus:ring-2 focus:ring-green-500"
                 />
-                <span class="text-lg">{option.course_name}</span>
+                <span class="text-lg">{toPersianNumbers(option.course_name)}</span>
             </label>
         {/each}
     </div>
