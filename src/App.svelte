@@ -2,10 +2,17 @@
 	import bgImage from "./assets/bg.jpg";
 	import axios from "axios";
 	import { onMount } from "svelte";
-
-	let flat_data = [];
-	let error = "NO_ERROR";
-	let selected_courses = ["1211011_01", "1711014_03", "2011192_01","1611042_01"];
+	import MultiSelectDropDown from "./components/MultiSelectDropDown.svelte";
+	let flat_data = $state([]);
+	let original_data = $state([]);
+	let error = $state("NO_ERROR");
+	let selected_courses = $state([
+		"1211011_01",
+		"1711014_03",
+		"2011192_01",
+		"1611042_01",
+		"1611033_01",
+	]);
 	async function fetch_data() {
 		try {
 			const response = await axios.get("http://127.0.0.1:5000/data");
@@ -13,13 +20,12 @@
 				([category, courses]) =>
 					courses.map((course) => ({ ...course, category })),
 			);
-			set_filtered_data();
-			console.log(flat_data);
+			original_data = response.data;
 		} catch (err) {
 			error = err.message;
 		}
 	}
-	let w = 45;
+	const W = 45;
 	fetch_data();
 
 	const TIMES = [
@@ -64,40 +70,60 @@
 	PERSIAN_WEEKDAY_MAP.set("TUESDAY", "سه شنبه");
 	PERSIAN_WEEKDAY_MAP.set("WEDNESDAY", "چهارشنبه");
 	PERSIAN_WEEKDAY_MAP.set("THURSDAY", "پنجشنبه");
-	let filtered_data = [];
-	function set_filtered_data() {
-		filtered_data = flat_data.filter(
-			(a) =>
-				selected_courses.findIndex(
-					(b) => b == a.course_number_and_group,
-				) != -1,
-		);
-	}
 
+	// let filtered_data = $state([]);
+	let filtered_data = $derived(
+		flat_data.filter((a) =>
+			selected_courses.includes(a.course_number_and_group),
+		),
+	);
+
+	function toPersianNumbers(num) {
+		const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
+		return num.toString().replace(/\d/g, (d) => persianDigits[d]);
+	}
 	onMount(fetch_data);
-	// console.log("data", flat_data);
-	// console.log("fdata", filtered_data);
+
+	function remove_course(id) {
+		selected_courses = [...selected_courses.filter((a) => a != id)];
+	}
 </script>
+<div class="max-w-xs mx-auto">
+<MultiSelectDropDown options={flat_data.map(item=>item.course_name)} selectedItems={selected_courses}/>
+
+</div>
+<!-- {#each Object.entries(original_data) as [key, v]}
+	<div class="max-w-xs mx-auto">
+		<select
+			id="course"
+			class="mt-5 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+		>
+			<option value="course1">{key}</option>
+			{#each v as item, i}
+				<option value="course1">{item.course_name}</option>
+			{/each}
+		</select>
+	</div>
+{/each} -->
 
 <div class="background" style="background-image: url({bgImage});">
-	<table class="w-full" style="table-layout: fixed;">
+	<table class="w-full" style="table-layout: fixed;" dir="rtl">
 		<thead>
 			<tr>
-				<th style="width:{w + 40}px;" class="border-b text-left">#</th>
+				<th style="width:{W + 40}px;" class="border-b text-right">#</th>
 				{#each TIMES as t, i}
-					{#if i % 2 == 0}
-						<th
-							style="width:{w}px;"
-							class="border-b text-left border-l"
-							>{t.substring(0, 2)}</th
-						>
-					{:else}
-						<th
-							style="width:{w}px;"
-							class="border-b text-left invisible">{t}</th
-						>
-					{/if}
-
+					<th
+						style="width:{W}px;"
+						class="border-b {i % 2 == 0
+							? 'text-rtl relative'
+							: 'invisible'}"
+					>
+						{#if i % 2 == 0}
+							<span class="absolute top-0 -right-2">
+								{toPersianNumbers(t.substring(0, 2))}
+							</span>
+						{/if}
+					</th>
 				{/each}
 			</tr>
 		</thead>
@@ -110,27 +136,29 @@
 					{#each TIMES as t, i}
 						{#if filtered_data.filter((a) => a.lecture_schedules.findIndex((b) => b.start_time == t && b.day_of_week == item) != -1).length > 0}
 							<td
-								style="height: 50px; width: {w}px"
+								style="height: 50px; width: {W}px"
 								class="border-b"
 							>
-								{#each filtered_data.filter((a) => a.lecture_schedules.findIndex((b) => b.start_time == t && b.day_of_week == item) != -1) as c, _}
+								{#each filtered_data.filter((a) => a.lecture_schedules.findIndex((b) => b.start_time == t && b.day_of_week == item) != -1) as c, j}
 									<div
-										class="bg-green-700 inline-block z-10 relative"
-										style="width: {3 * w}px"
+										on:click={() =>
+											remove_course(
+												c.course_number_and_group,
+											)}
+										class="bg-green-700 inline-block z-10 relative {j >
+										0
+											? 'border-t'
+											: ''}"
+										style="width: {3 * W}px"
 									>
-										{c.course_name}
+										{toPersianNumbers(c.course_name)}
 									</div>
 								{/each}
 							</td>
-						{:else if i % 2 == 0}
-							<td
-								style="height: 50px; width: {w}px"
-								class="border-l border-b"
-							></td>
 						{:else}
 							<td
-								style="height: 50px; width: {w}px"
-								class="border-b"
+								style="height: 50px; width: {W}px"
+								class="border-b {i % 2 == 0 ? 'border-r' : ''}"
 							></td>
 						{/if}
 					{/each}
