@@ -7,11 +7,6 @@
 	let original_data = $state([]);
 	let error = $state("NO_ERROR");
 	let selected_courses = $state([
-		"1211011_01",
-		"1711014_03",
-		"2011192_01",
-		"1611042_01",
-		"1611033_01",
 	]);
 	async function fetch_data() {
 		try {
@@ -26,6 +21,7 @@
 		}
 	}
 	const W = 45;
+	const DEFAULT_Z_INDEX=10;
 	fetch_data();
 
 	const TIMES = [
@@ -71,7 +67,6 @@
 	PERSIAN_WEEKDAY_MAP.set("WEDNESDAY", "چهارشنبه");
 	PERSIAN_WEEKDAY_MAP.set("THURSDAY", "پنجشنبه");
 
-	// let filtered_data = $state([]);
 	let filtered_data = $derived(
 		flat_data.filter((a) =>
 			selected_courses.includes(a.course_number_and_group),
@@ -87,24 +82,13 @@
 	function remove_course(id) {
 		selected_courses = [...selected_courses.filter((a) => a != id)];
 	}
+	let mouse_entered_id = $state("");
 </script>
 <div class="max-w-xs mx-auto">
-<MultiSelectDropDown options={flat_data.map(item=>item.course_name)} selectedItems={selected_courses}/>
+<MultiSelectDropDown options={flat_data}  bind:selectedItems={selected_courses}/>
 
 </div>
-<!-- {#each Object.entries(original_data) as [key, v]}
-	<div class="max-w-xs mx-auto">
-		<select
-			id="course"
-			class="mt-5 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-		>
-			<option value="course1">{key}</option>
-			{#each v as item, i}
-				<option value="course1">{item.course_name}</option>
-			{/each}
-		</select>
-	</div>
-{/each} -->
+
 
 <div class="background" style="background-image: url({bgImage});">
 	<table class="w-full" style="table-layout: fixed;" dir="rtl">
@@ -141,11 +125,13 @@
 							>
 								{#each filtered_data.filter((a) => a.lecture_schedules.findIndex((b) => b.start_time == t && b.day_of_week == item) != -1) as c, j}
 									<div
-										on:click={() =>
+										onmouseenter={() =>{mouse_entered_id = c.course_number_and_group}}
+										onmouseleave={() => mouse_entered_id = ""}
+										onclick={() =>
 											remove_course(
 												c.course_number_and_group,
 											)}
-										class="bg-green-700 inline-block z-10 relative {j >
+										class="cursor-pointer inline-block {mouse_entered_id == c.course_number_and_group ? `bg-red-700 z-${DEFAULT_Z_INDEX+10}`:`bg-green-700 z-${DEFAULT_Z_INDEX}`} relative {j >
 										0
 											? 'border-t'
 											: ''}"
