@@ -10,7 +10,8 @@
 	let selected_courses = $state([]);
 	async function fetch_data() {
 		try {
-			const response = await axios.get("http://127.0.0.1:5000/data");
+			const API_URL=import.meta.env.API_URL;
+			const response = await axios.get(API_URL+"/data");
 			flat_data = Object.entries(response.data).flatMap(
 				([category, courses]) =>
 					courses.map((course) => ({ ...course, category })),
