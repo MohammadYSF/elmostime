@@ -4,14 +4,17 @@
 	import MultiSelectDropDown from "./components/MultiSelectDropDown.svelte";
 	import { toPersianNumbers } from "./lib/helpers";
 	import { API_URL } from "./lib/helpers";
-	import { authStore,logout } from "./authStore";
+	import { authStore, logout } from "./authStore";
+	import dayjs from "dayjs";
+	import utc from 'dayjs/plugin/utc';
+	dayjs.extend(utc);
 
 	let flat_data = $state([]);
 	let original_data = $state([]);
 	let error = $state("NO_ERROR");
 	let selected_courses = $state([]);
-	const SCRAPE_DATETIME="scrape_datetime";
-	let last_scrape_datetime = $state(new Date());
+	const SCRAPE_DATETIME = "scrape_datetime";
+	let last_scrape_datetime = $state(dayjs());
 	async function fetch_data() {
 		try {
 			const response = await axios.get(API_URL + "/data", {
@@ -19,12 +22,15 @@
 					Authorization: `Bearer ${$authStore.token}`,
 				},
 			});
-			flat_data = Object.entries(response.data).filter(([k,v]) => k != SCRAPE_DATETIME).flatMap(
-				([category, courses]) =>
+			last_scrape_datetime = dayjs(response.data[SCRAPE_DATETIME]).local();
+			flat_data = Object.entries(response.data)
+				.filter(([k, v]) => k != SCRAPE_DATETIME)
+				.flatMap(([category, courses]) =>
 					courses.map((course) => ({ ...course, category })),
+				);
+			original_data = response.data.filter(
+				([k, v]) => k != SCRAPE_DATETIME,
 			);
-			original_data = response.data.filter(([k,v]) => k != SCRAPE_DATETIME);
-			last_scrape_datetime = new Date(response.data[SCRAPE_DATETIME]);
 		} catch (err) {
 			if (err.response && err.response.status === 401) {
 				logout();
@@ -35,7 +41,6 @@
 	let user_department = $state("ARCHITECTURE_ENG");
 	const W = 45;
 	const DEFAULT_Z_INDEX = 10;
-	fetch_data();
 
 	const TIMES = [
 		"07:00",
@@ -111,14 +116,12 @@
 	}
 	let mouse_entered_id = $state("");
 	const last_update_diff_in_minutes = $derived(
-		Math.floor(
-			(new Date().getTime() - last_scrape_datetime.getTime()) / 60000,
-		),
+		dayjs().diff(last_scrape_datetime,"minute")
 	);
 </script>
 
 <div class="grid grid-cols-4" dir="rtl">
-	<div class="col-span-4 md:col-span-1">
+	<div class="col-span-4 md:col-span-1 px-5">
 		<div class="" style="width: 100%;">
 			<h4>
 				آخرین بروزرسانی :{toPersianNumbers(last_update_diff_in_minutes)}
@@ -154,16 +157,16 @@
 				options={flat_data.filter((a) => a.category == "PHYSICS")}
 				bind:selectedItems={selected_courses}
 			/>
-			<MultiSelectDropDown
+			<!-- <MultiSelectDropDown
 				title="دانشکده شما : {DEPARTMENT_NAMES_MAP.get(
 					user_department,
 				)} ..."
 				options={flat_data.filter((a) => a.category == "ISLAMICEDU")}
 				bind:selectedItems={selected_courses}
-			/>
+			/> -->
 		</div>
 	</div>
-	<div class="col-span-4 md:col-span-3">
+	<div class="col-span-4 md:col-span-3 px-5">
 		<table
 			class="w-full"
 			style="table-layout: fixed; height: 450px;"
@@ -171,7 +174,7 @@
 		>
 			<thead>
 				<tr>
-					<th style="width:{W + 40}px;" class="border-b text-right"
+					<th style="width:{W + 40}px;height:5px;" class="border-b text-right"
 						>#</th
 					>
 					{#each TIMES as t, i}
@@ -244,12 +247,5 @@
 </div>
 
 <style>
-	.background {
-		/* background-image: url({}); */
-		background-size: cover;
-		background-position: center;
-	}
-	.overlay {
-		background-color: rgba(0, 0, 0, 0.6);
-	}
+	
 </style>
