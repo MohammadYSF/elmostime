@@ -3,26 +3,32 @@
 	import { onMount } from "svelte";
 	import MultiSelectDropDown from "./components/MultiSelectDropDown.svelte";
 	import { toPersianNumbers } from "./lib/helpers";
-    import { API_URL } from "./lib/helpers";
-    import { authStore } from "./authStore";
-	
+	import { API_URL } from "./lib/helpers";
+	import { authStore,logout } from "./authStore";
+
 	let flat_data = $state([]);
 	let original_data = $state([]);
 	let error = $state("NO_ERROR");
 	let selected_courses = $state([]);
+	const SCRAPE_DATETIME="scrape_datetime";
+	let last_scrape_datetime = $state(new Date());
 	async function fetch_data() {
 		try {
-			const response = await axios.get(API_URL + "/data",{
-				headers:{
-					Authorization:`Bearer ${$authStore.token}`
-				}
+			const response = await axios.get(API_URL + "/data", {
+				headers: {
+					Authorization: `Bearer ${$authStore.token}`,
+				},
 			});
-			flat_data = Object.entries(response.data).flatMap(
+			flat_data = Object.entries(response.data).filter(([k,v]) => k != SCRAPE_DATETIME).flatMap(
 				([category, courses]) =>
 					courses.map((course) => ({ ...course, category })),
 			);
-			original_data = response.data;
+			original_data = response.data.filter(([k,v]) => k != SCRAPE_DATETIME);
+			last_scrape_datetime = new Date(response.data[SCRAPE_DATETIME]);
 		} catch (err) {
+			if (err.response && err.response.status === 401) {
+				logout();
+			}
 			error = err.message;
 		}
 	}
@@ -104,11 +110,20 @@
 		selected_courses = [...selected_courses.filter((a) => a != id)];
 	}
 	let mouse_entered_id = $state("");
+	const last_update_diff_in_minutes = $derived(
+		Math.floor(
+			(new Date().getTime() - last_scrape_datetime.getTime()) / 60000,
+		),
+	);
 </script>
 
 <div class="grid grid-cols-4" dir="rtl">
 	<div class="col-span-4 md:col-span-1">
 		<div class="" style="width: 100%;">
+			<h4>
+				آخرین بروزرسانی :{toPersianNumbers(last_update_diff_in_minutes)}
+				دقیقه پیش
+			</h4>
 			<MultiSelectDropDown
 				additionalClass="mb-3"
 				title="همه دانشکده ها ..."

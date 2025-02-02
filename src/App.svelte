@@ -5,6 +5,7 @@
 	import { authStore, login, logout, checkAuthentication } from "./authStore";
 	import { onMount } from "svelte";
 	import TimeSchedules from "./TimeSchedules.svelte";
+    import Register from "./components/Register.svelte";
 	checkAuthentication();
 </script>
 
@@ -36,10 +37,8 @@
 
 	<main class="mt-5" style="max-width: 100%;">
 		<Route path="/login" component={Login} />
+		<Route path="/register" component={Register} />
 		<PrivateRoute path="/time" component={TimeSchedules} />
 	</main>
 
-	<!-- {#if !$authStore.isAuthenticated}
-		<h1>please login to use this website</h1>
-	{/if} -->
 </Router>
