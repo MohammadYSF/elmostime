@@ -146,7 +146,7 @@
 <div class="grid grid-cols-4" dir="rtl">
 	<div class="col-span-4 md:col-span-1 px-5">
 		<div class="" style="width: 100%;">
-			<h4>
+			<h4 class="mb-5">
 				آخرین بروزرسانی :{toPersianNumbers(last_update_diff_in_minutes)}
 				دقیقه پیش
 			</h4>
