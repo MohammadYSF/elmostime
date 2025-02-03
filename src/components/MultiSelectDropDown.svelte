@@ -1,20 +1,39 @@
 <!-- MultiSelectDropdown.svelte -->
 <script>
     import { toPersianNumbers } from "../lib/helpers";
-    let {options=[],selectedItems=$bindable([]),title="...",additionalClass=""} = $props();
+    let {
+        options = [],
+        selectedItems = $bindable([]),
+        title = "...",
+        additionalClass = "",
+        add_course,
+        remove_course,
+    } = $props();
     let search_term = $state("");
     let is_dropdown_open = $state(false);
     const toggle_dropdown = () => {
         is_dropdown_open = !is_dropdown_open;
     };
-    const filteredOptions =$derived(options.filter((option) => {
-        if (search_term == "")return true;
-        return option.course_name.includes(search_term.toLowerCase());
-    }));
+    const handle_checkbox_input_change = (e, id) => {
+        if (e.target.checked) {
+            add_course(id);
+        } else {
+            remove_course(id);
+        }
+    };
+    const filteredOptions = $derived(
+        options.filter((option) => {
+            if (search_term == "") return true;
+            return option.course_name.includes(search_term.toLowerCase());
+        }),
+    );
 </script>
 
-<div class="relative inline-block group {additionalClass}" style="width: 100%;" dir="rtl">
-
+<div
+    class="relative inline-block group {additionalClass}"
+    style="width: 100%;"
+    dir="rtl"
+>
     <input
         type="text"
         placeholder={title}
@@ -32,17 +51,24 @@
         {#each filteredOptions as option}
             <label class="flex items-center space-x-2 py-3">
                 <input
+                    onchange={(e) => {
+                        handle_checkbox_input_change(
+                            e,
+                            option.course_number_and_group,
+                        );
+                    }}
                     type="checkbox"
                     bind:group={selectedItems}
                     value={option.course_number_and_group}
                     class="w-6 h-6 text-green-500 focus:ring-2 focus:ring-green-500"
                 />
-                <span class="text-lg">{toPersianNumbers(option.course_name)}</span>
+                <span class="text-lg"
+                    >{toPersianNumbers(option.course_name)}</span
+                >
             </label>
         {/each}
     </div>
 </div>
 
 <style>
-
 </style>

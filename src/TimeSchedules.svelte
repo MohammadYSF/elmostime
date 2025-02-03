@@ -6,9 +6,10 @@
 	import { API_URL } from "./lib/helpers";
 	import { authStore, logout } from "./authStore";
 	import dayjs from "dayjs";
-	import utc from 'dayjs/plugin/utc';
+	import utc from "dayjs/plugin/utc";
+	import { jwtDecode } from "jwt-decode";
 	dayjs.extend(utc);
-
+	
 	let flat_data = $state([]);
 	let original_data = $state([]);
 	let error = $state("NO_ERROR");
@@ -22,7 +23,15 @@
 					Authorization: `Bearer ${$authStore.token}`,
 				},
 			});
-			last_scrape_datetime = dayjs(response.data[SCRAPE_DATETIME]).local();
+			const response2=await axios.get(API_URL+"/userCourses",{
+				headers:{
+					Authorization:`Bearer ${$authStore.token}`
+				}
+			});
+			selected_courses=response2.data;
+			last_scrape_datetime = dayjs(
+				response.data[SCRAPE_DATETIME],
+			).local();
 			flat_data = Object.entries(response.data)
 				.filter(([k, v]) => k != SCRAPE_DATETIME)
 				.flatMap(([category, courses]) =>
@@ -31,6 +40,7 @@
 			original_data = response.data.filter(
 				([k, v]) => k != SCRAPE_DATETIME,
 			);
+
 		} catch (err) {
 			if (err.response && err.response.status === 401) {
 				logout();
@@ -111,12 +121,25 @@
 
 	onMount(fetch_data);
 
-	function remove_course(id) {
-		selected_courses = [...selected_courses.filter((a) => a != id)];
+	async function remove_course(id) {
+		const response = await axios.put(API_URL + "/userCourses", [id], {
+			headers: {
+				Authorization: `Bearer ${$authStore.token}`,
+			},
+		});
+		selected_courses = response.data;
+	}
+	async function add_course(id) {
+		const response = await axios.post(API_URL + "/userCourses", [id], {
+			headers: {
+				Authorization: `Bearer ${$authStore.token}`,
+			},
+		});
+		selected_courses = response.data;
 	}
 	let mouse_entered_id = $state("");
 	const last_update_diff_in_minutes = $derived(
-		dayjs().diff(last_scrape_datetime,"minute")
+		dayjs().diff(last_scrape_datetime, "minute"),
 	);
 </script>
 
@@ -128,30 +151,40 @@
 				دقیقه پیش
 			</h4>
 			<MultiSelectDropDown
+				{add_course}
+				{remove_course}
 				additionalClass="mb-3"
 				title="همه دانشکده ها ..."
 				options={flat_data}
 				bind:selectedItems={selected_courses}
 			/>
 			<MultiSelectDropDown
+				{add_course}
+				{remove_course}
 				additionalClass="mb-3"
 				title="{DEPARTMENT_NAMES_MAP.get('ISLAMICEDU')} ..."
 				options={flat_data.filter((a) => a.category == "ISLAMICEDU")}
 				bind:selectedItems={selected_courses}
 			/>
 			<MultiSelectDropDown
+				{add_course}
+				{remove_course}
 				additionalClass="mb-3"
 				title="{DEPARTMENT_NAMES_MAP.get('PHYSICALEDU')} ..."
 				options={flat_data.filter((a) => a.category == "PHYSICALEDU")}
 				bind:selectedItems={selected_courses}
 			/>
 			<MultiSelectDropDown
+				{add_course}
+				{remove_course}
 				additionalClass="mb-3"
 				title="{DEPARTMENT_NAMES_MAP.get('MATH')} ..."
 				options={flat_data.filter((a) => a.category == "MATH")}
 				bind:selectedItems={selected_courses}
 			/>
 			<MultiSelectDropDown
+				{add_course}
+				{remove_course}
 				additionalClass="mb-3"
 				title="{DEPARTMENT_NAMES_MAP.get('PHYSICS')} ..."
 				options={flat_data.filter((a) => a.category == "PHYSICS")}
@@ -174,8 +207,9 @@
 		>
 			<thead>
 				<tr>
-					<th style="width:{W + 40}px;height:5px;" class="border-b text-right"
-						>#</th
+					<th
+						style="width:{W + 40}px;height:5px;"
+						class="border-b text-right">#</th
 					>
 					{#each TIMES as t, i}
 						<th
@@ -247,5 +281,4 @@
 </div>
 
 <style>
-	
 </style>

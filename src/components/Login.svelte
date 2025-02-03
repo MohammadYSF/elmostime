@@ -4,8 +4,8 @@
     import { API_URL } from "../lib/helpers";
     import axios from "axios";
     import { Link } from "svelte-routing";
-    let username = "";
-    let password = "";
+    let username = $state("");
+    let password = $state("");
     let errorMessage = "";
     async function handleLogin() {
         try {
