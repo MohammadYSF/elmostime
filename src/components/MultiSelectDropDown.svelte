@@ -67,9 +67,9 @@
                 >
                 <span class="text-yellow-600">{option.professor_name}</span>
                 <div dir="ltr">
-                    <span class="text-red-500">{option.registered}</span>
+                    <span class="text-red-500">{toPersianNumbers(option.registered)}</span>
                     <span class="text-gray-700">/</span>
-                    <span class="text-blue-500">{option.capacity}</span>
+                    <span class="text-blue-500">{toPersianNumbers(option.capacity)}</span>
                 </div>
             </label>
         {/each}
