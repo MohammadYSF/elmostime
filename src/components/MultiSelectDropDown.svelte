@@ -44,7 +44,7 @@
     />
     <div
         style="width: 100%;max-height: 500px;"
-        class="absolute hidden bg-yellow-700 shadow-md rounded-md w-48 mt-0 p-2 z-10 overflow-y-auto"
+        class="absolute hidden bg-gray-100 shadow-md rounded-md w-48 mt-0 p-2 z-10 overflow-y-auto"
         class:block={is_dropdown_open}
         class:hidden={!is_dropdown_open}
     >
@@ -62,9 +62,15 @@
                     value={option.course_number_and_group}
                     class="w-6 h-6 text-green-500 focus:ring-2 focus:ring-green-500"
                 />
-                <span class="text-lg"
+                <span class="text-lg text-gray-600 pr-2"
                     >{toPersianNumbers(option.course_name)}</span
                 >
+                <span class="text-yellow-600">{option.professor_name}</span>
+                <div dir="ltr">
+                    <span class="text-red-500">{option.registered}</span>
+                    <span class="text-gray-700">/</span>
+                    <span class="text-blue-500">{option.capacity}</span>
+                </div>
             </label>
         {/each}
     </div>

@@ -237,7 +237,7 @@
 							{#if filtered_data.filter((a) => a.lecture_schedules.findIndex((b) => b.start_time == t && b.day_of_week == item) != -1).length > 0}
 								<td
 									style="height: 50px; width: {W}px"
-									class="border-b"
+									class="border-b {i % 2 == 0 ? 'border-r':''}"
 								>
 									{#each filtered_data.filter((a) => a.lecture_schedules.findIndex((b) => b.start_time == t && b.day_of_week == item) != -1) as c, j}
 										<div
