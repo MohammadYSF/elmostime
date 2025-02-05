@@ -1,5 +1,30 @@
 <script>
     import { Link } from "svelte-routing";
+    import { navigate } from "svelte-routing";
+    import { API_URL } from "../lib/helpers";
+    import axios from "axios";
+    let username = $state("");
+    let password = $state("");
+    let errorMessage = "";
+    async function handleLogin() {
+        try {
+            const response = await axios.post(`${API_URL}/register`, {
+                username,
+                password,
+            });
+
+            const data = response.data;
+
+            if (data.access_token) {
+                navigate("/login");
+            } else {
+                errorMessage = "Invalid credentials";
+            }
+        } catch (err) {
+            errorMessage = "An error occurred";
+            console.error(err);
+        }
+    }
 </script>
 
 <div class="bg-white shadow-lg rounded-lg p-8 max-w-md w-full mx-auto">
@@ -8,7 +33,7 @@
     </h2>
 
     <!-- Registration Form -->
-    <form action="#" method="POST">
+    <form method="POST">
         <!-- Username -->
         <div class="mb-4">
             <label
@@ -17,6 +42,7 @@
                 >نام کاربری</label
             >
             <input
+                bind:value={username}
                 type="text"
                 id="username"
                 name="username"
@@ -32,6 +58,7 @@
                 class="block text-sm font-medium text-gray-700">رمزعبور</label
             >
             <input
+                bind:value={password}
                 type="password"
                 id="password"
                 name="password"
@@ -43,7 +70,8 @@
         <!-- Submit Button -->
         <div class="mb-4">
             <button
-                type="submit"
+                onclick={handleLogin}
+                type="button"
                 class="w-full py-2 px-4 bg-purple-600 text-white text-lg font-semibold rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
             >
                 ثبت نام

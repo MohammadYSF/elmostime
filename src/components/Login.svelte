@@ -66,19 +66,6 @@
             />
         </div>
 
-        <!-- Remember Me -->
-        <div class="flex items-center mb-6">
-            <input
-                type="checkbox"
-                id="remember"
-                name="remember"
-                class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-            />
-            <label for="remember" class="ml-2 text-sm text-gray-600"
-                >مرا به خاطر بسپار</label
-            >
-        </div>
-
         <!-- Submit Button -->
         <button
             onclick={handleLogin}
