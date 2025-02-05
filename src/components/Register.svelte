@@ -15,7 +15,7 @@
 
             const data = response.data;
 
-            if (data.access_token) {
+            if (response.status == 201) {
                 navigate("/login");
             } else {
                 errorMessage = "Invalid credentials";
