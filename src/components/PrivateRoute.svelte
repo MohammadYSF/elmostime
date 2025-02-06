@@ -2,6 +2,7 @@
     import { authStore } from "../authStore";
     import { navigate } from "svelte-routing";
     import { onDestroy } from "svelte";
+	import { Route, Router, Link } from "svelte-routing";
 
     export let component; // The component to render
     export let path; // The route path
@@ -25,5 +26,5 @@
 </script>
 
 {#if $authStore.isAuthenticated}
-    <svelte:component this={component} />
+    <Route path={path} component={component}  />
 {/if}

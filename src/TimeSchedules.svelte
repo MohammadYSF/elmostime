@@ -2,8 +2,7 @@
 	import axios from "axios";
 	import { onMount } from "svelte";
 	import MultiSelectDropDown from "./components/MultiSelectDropDown.svelte";
-	import { toPersianNumbers } from "./lib/helpers";
-	import { API_URL } from "./lib/helpers";
+	import { toPersianNumbers,API_URL,countHalfHours } from "./lib/helpers";
 	import { authStore, logout } from "./authStore";
 	import dayjs from "dayjs";
 	import utc from "dayjs/plugin/utc";
@@ -49,7 +48,7 @@
 		}
 	}
 	let user_department = $state("ARCHITECTURE_ENG");
-	const W = 45;
+	const W = 23;
 	const DEFAULT_Z_INDEX = 10;
 
 	const TIMES = [
@@ -258,7 +257,7 @@
 											0
 												? 'border-t'
 												: ''}"
-											style="width: {3 * W}px"
+											style="width: {countHalfHours(c.lecture_schedules.find(a=> a.start_time == t && a.day_of_week == item).start_time,c.lecture_schedules.find(a=> a.start_time == t && a.day_of_week == item).end_time) * W}px"
 										>
 											{toPersianNumbers(c.course_name)}
 										</div>

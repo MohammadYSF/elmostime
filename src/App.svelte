@@ -6,6 +6,7 @@
 	import { onMount } from "svelte";
 	import TimeSchedules from "./TimeSchedules.svelte";
     import Register from "./components/Register.svelte";
+    import Exams from "./Exams.svelte";
 	checkAuthentication();
 </script>
 
@@ -38,6 +39,7 @@
 	<main class="mt-5" style="max-width: 100%;">
 		<Route path="/login" component={Login} />
 		<Route path="/register" component={Register} />
+		<PrivateRoute path="/exams" component={Exams} />
 		<PrivateRoute path="/time" component={TimeSchedules} />
 	</main>
 
