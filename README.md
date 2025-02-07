@@ -1,5 +1,11 @@
 # Elmostime (frontend)
 
+![](doc_images/img_home.png)
+![](doc_images/img_ts.png)
+![](doc_images/img_exam.png)
+![](doc_images/img_login.png)
+![](doc_images/img_register.png)
+
 ## Overview
 
 This project provides a university course timetable application. Users can select their enrolled courses for a term and view their weekly schedule and exam dates in a structured table format. The frontend is built using pure Svelte, while the backend consists of a Flask API that interacts with MongoDB.
