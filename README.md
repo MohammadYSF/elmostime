@@ -4,6 +4,9 @@
 
 This project provides a university course timetable application. Users can select their enrolled courses for a term and view their weekly schedule and exam dates in a structured table format. The frontend is built using pure Svelte, while the backend consists of a Flask API that interacts with MongoDB.
 
+
+Visit https://github.com/MohammadYSF/golestan_scrape  for the backend application
+
 ## Features
 
 - View weekly university timetables by selecting a course.

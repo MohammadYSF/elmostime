@@ -22,8 +22,11 @@
         با معرفی عملوص تایم به دوستان خود از ما حمایت کنید
     </p>
     <p class="text-gray-500 text-right mb-2" dir="rtl">
-        با ستاره دادن به مخزن گیتهاب
-        <a href="#">علموص تایم</a>
+        با ستاره دادن به 
+        <a href="https://github.com/MohammadYSF/elmostime">این</a>
+        و
+        <a href="https://github.com/MohammadYSF/golestan_scrape">این</a>
+        مخازن گیتهاب
         از ما حمایت کنید
     </p>
     <p class="text-gray-500 text-right" dir="rtl">
