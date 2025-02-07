@@ -1,47 +1,78 @@
-# Svelte + Vite
+# Elmostime (frontend)
 
-This template should help get you started developing with Svelte in Vite.
+## Overview
 
-## Recommended IDE Setup
+This project provides a university course timetable application. Users can select their enrolled courses for a term and view their weekly schedule and exam dates in a structured table format. The frontend is built using pure Svelte, while the backend consists of a Flask API that interacts with MongoDB.
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+## Features
 
-## Need an official Svelte framework?
+- View weekly university timetables by selecting a course.
+- Display exam dates alongside course schedules.
+- Frontend built with pure Svelte and Vite.
+- JWT-based authentication .
+- Docker Compose for easy deployment.
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+## Installation
 
-## Technical considerations
+### Prerequisites
 
-**Why use this over SvelteKit?**
+Ensure you have the following installed:
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+- Docker & Docker Compose (for Docker setup)
+- Node.js (for manual setup)
 
-This template contains as little as possible to get started with Vite + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+### Setup
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+#### Using Docker
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/your-repo.git
+   cd your-repo
+   ```
+2. Create a `.env` file in the root directory and define your environment variables:
+   ```ini
+   VITE_API_URL=http://backend:5000
+   ```
+3. Start the services using Docker Compose:
+   ```sh
+   docker-compose up --build
+   ```
+4. The frontend will be available at `http://localhost:5173`.
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+#### Without Docker
 
-**Why include `.vscode/extensions.json`?**
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/your-repo.git
+   cd your-repo
+   ```
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+3. Set environment variables manually:
+   ```sh
+   export VITE_API_URL="http://localhost:5000"
+   ```
+4. Start the development server:
+   ```sh
+   npm run dev
+   ```
+5. Navigate to `http://localhost:5173` to access the frontend.
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+## API Integration
 
-**Why enable `checkJs` in the JS template?**
+The frontend communicates with the Flask backend API. Ensure the backend is running before using the application.
 
-It is likely that most cases of changing variable types in runtime are likely to be accidental, rather than deliberate. This provides advanced typechecking out of the box. Should you like to take advantage of the dynamically-typed nature of JavaScript, it is trivial to change the configuration.
+## Contributing
 
-**Why is HMR not preserving my local component state?**
+Feel free to contribute by submitting issues and pull requests.
 
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/sveltejs/svelte-hmr/tree/master/packages/svelte-hmr#preservation-of-local-state).
+## License
 
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
+This project is licensed under the MIT License.
 
-```js
-// store.js
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
-```
+## Author
+Mohammad Yousefiyan
+

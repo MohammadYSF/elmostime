@@ -5,5 +5,5 @@ services:
     build: .
     ports:
       - "80:80"
-    environment:
-      - VITE_API_URL=http://localhost:5000
+    env_file:
+      - .env
