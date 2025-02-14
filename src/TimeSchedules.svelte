@@ -14,15 +14,19 @@
 	dayjs.extend(utc);
 
 	let flat_data = $state([]);
+	let departments = $state([]);
 	let ta_data = $state([]);
 	let original_data = $state([]);
 	let error = $state("NO_ERROR");
 	let selected_courses = $state([]);
 	const SCRAPE_DATETIME = "scrape_datetime";
 	let last_scrape_datetime = $state(dayjs());
+	const payload = jwtDecode($authStore.token);
+	let user_department = payload.department;
+	let user_sex = payload.sex;
 	async function fetch_data() {
 		try {
-			const [response, response2] = await Promise.all([
+			const [response, response2, response3] = await Promise.all([
 				api.get(API_URL + "/data", {
 					cache: {
 						ttl: 1000 * 60 * 5,
@@ -38,7 +42,16 @@
 						Authorization: `Bearer ${$authStore.token}`,
 					},
 				}),
+				api.get(API_URL + "/departments", {
+					cache: {
+						ttl: 1000 * 60 * (24 * 60),
+					},
+					headers: {
+						Authorization: `Bearer ${$authStore.token}`,
+					},
+				}),
 			]);
+			departments = response3.data;
 			selected_courses = response2.data;
 			last_scrape_datetime = dayjs(
 				response.data[SCRAPE_DATETIME],
@@ -47,20 +60,23 @@
 				.filter(([k, v]) => k != SCRAPE_DATETIME)
 				.flatMap(([category, courses]) =>
 					courses.map((course) => ({ ...course, category })),
-				);
-			ta_data = flat_data.filter(a=> a.ta_schedule != undefined).map((item) => {
-				return {
-					course_number_and_group: item.course_number_and_group,
-					course_name: `حل تمرین ${item.course_name}`,
-					lecture_schedules: [
-						{
-							start_time: item.ta_schedule?.start_time,
-							end_time: item.ta_schedule?.end_time,
-							day_of_week: item.ta_schedule?.day_of_week,
-						},
-					],
-				};
-			});
+				)
+				.filter((a) => ["COMPLEX", user_sex].includes(a.sex));
+			ta_data = flat_data
+				.filter((a) => a.ta_schedule != undefined)
+				.map((item) => {
+					return {
+						course_number_and_group: item.course_number_and_group,
+						course_name: `حل تمرین ${item.course_name}`,
+						lecture_schedules: [
+							{
+								start_time: item.ta_schedule?.start_time,
+								end_time: item.ta_schedule?.end_time,
+								day_of_week: item.ta_schedule?.day_of_week,
+							},
+						],
+					};
+				});
 			original_data = response.data.filter(
 				([k, v]) => k != SCRAPE_DATETIME,
 			);
@@ -71,7 +87,6 @@
 			error = err.message;
 		}
 	}
-	let user_department = $state("ARCHITECTURE_ENG");
 	const W = 23;
 	const DEFAULT_Z_INDEX = 10;
 
@@ -117,25 +132,6 @@
 	PERSIAN_WEEKDAY_MAP.set("TUESDAY", "سه شنبه");
 	PERSIAN_WEEKDAY_MAP.set("WEDNESDAY", "چهارشنبه");
 	PERSIAN_WEEKDAY_MAP.set("THURSDAY", "پنجشنبه");
-	const DEPARTMENT_NAMES_MAP = new Map();
-	DEPARTMENT_NAMES_MAP.set("ELECTRICAL_ENG", "برق");
-	DEPARTMENT_NAMES_MAP.set("RAILWAY_ENG", "راه آهن");
-	DEPARTMENT_NAMES_MAP.set("INDUSTRIAL_ENG", "صنایع");
-	DEPARTMENT_NAMES_MAP.set("PHYSICS", "فیزیک");
-	DEPARTMENT_NAMES_MAP.set("METALOGY_ENG", "مواد");
-	DEPARTMENT_NAMES_MAP.set("ARCHITECTURE_ENG", "معماری");
-	DEPARTMENT_NAMES_MAP.set("MECHANICAL_ENG", "مکانیک");
-	DEPARTMENT_NAMES_MAP.set("CHEMICAL_ENG", "م شیمی");
-	DEPARTMENT_NAMES_MAP.set("CIVIL_ENG", "عمران");
-	DEPARTMENT_NAMES_MAP.set("COMPUTER_ENG", "کامپیوتر");
-	DEPARTMENT_NAMES_MAP.set("PHYSICALEDU", "تربیت بدنی");
-	DEPARTMENT_NAMES_MAP.set("ISLAMICEDU", "معارف");
-	DEPARTMENT_NAMES_MAP.set("CHEMISTRY", "شیمی");
-	DEPARTMENT_NAMES_MAP.set("MANAGEMENT", "مدیریت");
-	DEPARTMENT_NAMES_MAP.set("NOOR", "واحد نور");
-	DEPARTMENT_NAMES_MAP.set("PARDIS", "پردیس");
-	DEPARTMENT_NAMES_MAP.set("GENERAL", "سایر");
-	DEPARTMENT_NAMES_MAP.set("MATH", "ریاضی");
 	let filtered_data = $derived(
 		flat_data
 			.concat(ta_data)
@@ -169,6 +165,7 @@
 		dayjs().diff(last_scrape_datetime, "minute"),
 	);
 </script>
+
 <div class="grid grid-cols-4" dir="rtl">
 	<div class="col-span-4 md:col-span-1 px-5">
 		<div class="" style="width: 100%;">
@@ -188,7 +185,7 @@
 				{add_course}
 				{remove_course}
 				additionalClass="mb-3"
-				title="{DEPARTMENT_NAMES_MAP.get('ISLAMICEDU')} ..."
+				title="{departments.find(a=> a.value=="ISLAMICEDU")?.label} ..."
 				options={flat_data.filter((a) => a.category == "ISLAMICEDU")}
 				bind:selectedItems={selected_courses}
 			/>
@@ -196,7 +193,7 @@
 				{add_course}
 				{remove_course}
 				additionalClass="mb-3"
-				title="{DEPARTMENT_NAMES_MAP.get('PHYSICALEDU')} ..."
+				title="{departments.find(a=> a.value=="PHYSICALEDU")?.label} ..."				
 				options={flat_data.filter((a) => a.category == "PHYSICALEDU")}
 				bind:selectedItems={selected_courses}
 			/>
@@ -204,7 +201,7 @@
 				{add_course}
 				{remove_course}
 				additionalClass="mb-3"
-				title="{DEPARTMENT_NAMES_MAP.get('MATH')} ..."
+				title="{departments.find(a=> a.value=="MATH")?.label} ..."				
 				options={flat_data.filter((a) => a.category == "MATH")}
 				bind:selectedItems={selected_courses}
 			/>
@@ -212,17 +209,18 @@
 				{add_course}
 				{remove_course}
 				additionalClass="mb-3"
-				title="{DEPARTMENT_NAMES_MAP.get('PHYSICS')} ..."
+				title="{departments.find(a=> a.value=="PHYSICS")?.label} ..."				
 				options={flat_data.filter((a) => a.category == "PHYSICS")}
 				bind:selectedItems={selected_courses}
 			/>
-			<!-- <MultiSelectDropDown
-				title="دانشکده شما : {DEPARTMENT_NAMES_MAP.get(
-					user_department,
-				)} ..."
-				options={flat_data.filter((a) => a.category == "ISLAMICEDU")}
+			<MultiSelectDropDown
+				{add_course}
+				{remove_course}
+				additionalClass="mb-3"
+				title="دانشکده شما : {departments.find(a=> a.value == user_department)?.label} ..."
+				options={flat_data.filter((a) => a.category == user_department)}
 				bind:selectedItems={selected_courses}
-			/> -->
+			/>
 		</div>
 	</div>
 	<div class="col-span-4 md:col-span-3 px-5">
