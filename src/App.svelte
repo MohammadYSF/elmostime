@@ -5,6 +5,7 @@
 	import { authStore, logout, checkAuthentication } from "./authStore";
 	import TimeSchedules from "./TimeSchedules.svelte";
 	import Register from "./components/Register.svelte";
+	import Summary from "./Summary.svelte";
 	import Exams from "./Exams.svelte";
 	import Home from "./Home.svelte";
 	checkAuthentication();
@@ -21,7 +22,9 @@
 				<Link to="/exams" class="text-gray-300 hover:text-green-600"
 					>امتحانات</Link
 				>
-
+				<Link to="/summary" class="text-gray-300 hover:text-green-600"
+					>خلاصه</Link
+				>
 				<a
 					role="button"
 					onclick={logout}
@@ -45,6 +48,7 @@
 		<Route path="/" component={Home} />
 		<Route path="/login" component={Login} />
 		<PrivateRoute path="/exams" component={Exams} />
+		<PrivateRoute path="/summary" component={Summary} />
 		<PrivateRoute path="/time" component={TimeSchedules} />
 	</main>
 </Router>
