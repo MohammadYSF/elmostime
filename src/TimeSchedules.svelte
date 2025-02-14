@@ -2,13 +2,13 @@
 	import axios from "axios";
 	import { onMount } from "svelte";
 	import MultiSelectDropDown from "./components/MultiSelectDropDown.svelte";
-	import { toPersianNumbers,API_URL,countHalfHours } from "./lib/helpers";
+	import { toPersianNumbers, API_URL, countHalfHours } from "./lib/helpers";
 	import { authStore, logout } from "./authStore";
 	import dayjs from "dayjs";
 	import utc from "dayjs/plugin/utc";
 	import { jwtDecode } from "jwt-decode";
 	dayjs.extend(utc);
-	
+
 	let flat_data = $state([]);
 	let original_data = $state([]);
 	let error = $state("NO_ERROR");
@@ -22,12 +22,12 @@
 					Authorization: `Bearer ${$authStore.token}`,
 				},
 			});
-			const response2=await axios.get(API_URL+"/userCourses",{
-				headers:{
-					Authorization:`Bearer ${$authStore.token}`
-				}
+			const response2 = await axios.get(API_URL + "/userCourses", {
+				headers: {
+					Authorization: `Bearer ${$authStore.token}`,
+				},
 			});
-			selected_courses=response2.data;
+			selected_courses = response2.data;
 			last_scrape_datetime = dayjs(
 				response.data[SCRAPE_DATETIME],
 			).local();
@@ -39,7 +39,6 @@
 			original_data = response.data.filter(
 				([k, v]) => k != SCRAPE_DATETIME,
 			);
-
 		} catch (err) {
 			if (err.response && err.response.status === 401) {
 				logout();
@@ -236,7 +235,9 @@
 							{#if filtered_data.filter((a) => a.lecture_schedules.findIndex((b) => b.start_time == t && b.day_of_week == item) != -1).length > 0}
 								<td
 									style="height: 50px; width: {W}px"
-									class="border-b {i % 2 == 0 ? 'border-r':''}"
+									class="border-b {i % 2 == 0
+										? 'border-r'
+										: ''}"
 								>
 									{#each filtered_data.filter((a) => a.lecture_schedules.findIndex((b) => b.start_time == t && b.day_of_week == item) != -1) as c, j}
 										<div
@@ -250,14 +251,25 @@
 												remove_course(
 													c.course_number_and_group,
 												)}
-											class="cursor-pointer inline-block {mouse_entered_id ==
+											class="transition-all duration-300 ease-in-out cursor-pointer inline-block {mouse_entered_id ==
 											c.course_number_and_group
 												? `bg-red-700 z-${DEFAULT_Z_INDEX + 10}`
 												: `bg-green-700 z-${DEFAULT_Z_INDEX}`} relative {j >
 											0
 												? 'border-t'
 												: ''}"
-											style="width: {countHalfHours(c.lecture_schedules.find(a=> a.start_time == t && a.day_of_week == item).start_time,c.lecture_schedules.find(a=> a.start_time == t && a.day_of_week == item).end_time) * W}px"
+											style="width: {countHalfHours(
+												c.lecture_schedules.find(
+													(a) =>
+														a.start_time == t &&
+														a.day_of_week == item,
+												).start_time,
+												c.lecture_schedules.find(
+													(a) =>
+														a.start_time == t &&
+														a.day_of_week == item,
+												).end_time,
+											) * W}px;overflow-x:clip"
 										>
 											{toPersianNumbers(c.course_name)}
 										</div>
