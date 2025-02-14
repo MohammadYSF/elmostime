@@ -1,18 +1,38 @@
 <script>
     import { Link } from "svelte-routing";
     import { navigate } from "svelte-routing";
-    import { API_URL,api } from "../lib/helpers";
+    import { API_URL, api } from "../lib/helpers";
+    import { onMount } from "svelte";
     let username = $state("");
     let password = $state("");
+    let departments = $state([]);
+    let selected_sex = $state("");
+    let selected_department = $state("");
     let errorMessage = "";
+    async function fetch_data() {
+        const response = await api.get(`${API_URL}/departments`, {
+            cache: {
+                ttl: 1000 * 60 * (24 * 60),
+            },
+        });
+        departments = response.data;
+        console.log(response.data);
+    }
+    onMount(fetch_data);
     async function handleRegister() {
         try {
-            const response = await api.post(`${API_URL}/register`, {
-                username,
-                password,
-            },{
-                cache:false
-            });
+            const response = await api.post(
+                `${API_URL}/register`,
+                {
+                    username,
+                    password,
+                    sex: selected_sex,
+                    department:selected_department
+                },
+                {
+                    cache: false,
+                },
+            );
 
             const data = response.data;
 
@@ -67,8 +87,34 @@
                 required
             />
         </div>
-
-        <!-- Submit Button -->
+        <div class="mb-4">
+            <select
+                style="overflow-y: auto;"
+                class="w-full bg-white text-gray-700 border border-gray-700 px-4"
+                bind:value={selected_department}
+                dir="rtl"
+            >
+                <option value="" disabled selected
+                    >دانشکده ت رو انتخاب کن
+                </option>
+                {#each departments as dep}
+                    <option value={dep.value}>{dep.label}</option>
+                {/each}
+            </select>
+        </div>
+        <div class="mb-4">
+            <select
+                class="w-full bg-white text-gray-700 border border-gray-700 px-4"
+                bind:value={selected_sex}
+                dir="rtl"
+            >
+                <option value="" disabled selected
+                    >جنسیت را انتخاب کنید
+                </option>
+                <option value="MALE">آقا</option>
+                <option value="FEMALE">خانم</option>
+            </select>
+        </div>
         <div class="mb-4">
             <button
                 onclick={handleRegister}
