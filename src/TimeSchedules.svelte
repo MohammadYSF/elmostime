@@ -1,7 +1,12 @@
 <script>
 	import { onMount } from "svelte";
 	import MultiSelectDropDown from "./components/MultiSelectDropDown.svelte";
-	import { toPersianNumbers, API_URL, countHalfHours,api } from "./lib/helpers";
+	import {
+		toPersianNumbers,
+		API_URL,
+		countHalfHours,
+		api,
+	} from "./lib/helpers";
 	import { authStore, logout } from "./authStore";
 	import dayjs from "dayjs";
 	import utc from "dayjs/plugin/utc";
@@ -9,6 +14,7 @@
 	dayjs.extend(utc);
 
 	let flat_data = $state([]);
+	let ta_data = $state([]);
 	let original_data = $state([]);
 	let error = $state("NO_ERROR");
 	let selected_courses = $state([]);
@@ -18,16 +24,16 @@
 		try {
 			const [response, response2] = await Promise.all([
 				api.get(API_URL + "/data", {
-					cache:{
-						ttl:1000*60*5
+					cache: {
+						ttl: 1000 * 60 * 5,
 					},
 					headers: {
 						Authorization: `Bearer ${$authStore.token}`,
-                        'Cache-Control': 'public, max-age=60'
+						"Cache-Control": "public, max-age=60",
 					},
 				}),
 				api.get(API_URL + "/userCourses", {
-					cache:false,
+					cache: false,
 					headers: {
 						Authorization: `Bearer ${$authStore.token}`,
 					},
@@ -42,6 +48,19 @@
 				.flatMap(([category, courses]) =>
 					courses.map((course) => ({ ...course, category })),
 				);
+			ta_data = flat_data.filter(a=> a.ta_schedule != undefined).map((item) => {
+				return {
+					course_number_and_group: item.course_number_and_group,
+					course_name: `حل تمرین ${item.course_name}`,
+					lecture_schedules: [
+						{
+							start_time: item.ta_schedule?.start_time,
+							end_time: item.ta_schedule?.end_time,
+							day_of_week: item.ta_schedule?.day_of_week,
+						},
+					],
+				};
+			});
 			original_data = response.data.filter(
 				([k, v]) => k != SCRAPE_DATETIME,
 			);
@@ -118,16 +137,18 @@
 	DEPARTMENT_NAMES_MAP.set("GENERAL", "سایر");
 	DEPARTMENT_NAMES_MAP.set("MATH", "ریاضی");
 	let filtered_data = $derived(
-		flat_data.filter((a) =>
-			selected_courses.includes(a.course_number_and_group),
-		),
+		flat_data
+			.concat(ta_data)
+			.filter((a) =>
+				selected_courses.includes(a.course_number_and_group),
+			),
 	);
 
 	onMount(fetch_data);
 
 	async function remove_course(id) {
 		const response = await api.put(API_URL + "/userCourses", [id], {
-			cache:false,
+			cache: false,
 			headers: {
 				Authorization: `Bearer ${$authStore.token}`,
 			},
@@ -136,7 +157,7 @@
 	}
 	async function add_course(id) {
 		const response = await api.post(API_URL + "/userCourses", [id], {
-			cache:false,
+			cache: false,
 			headers: {
 				Authorization: `Bearer ${$authStore.token}`,
 			},
@@ -148,7 +169,6 @@
 		dayjs().diff(last_scrape_datetime, "minute"),
 	);
 </script>
-
 <div class="grid grid-cols-4" dir="rtl">
 	<div class="col-span-4 md:col-span-1 px-5">
 		<div class="" style="width: 100%;">
