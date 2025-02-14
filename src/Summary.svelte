@@ -36,15 +36,16 @@
     <table class="table  table-fixed  w-full col-span-4 xl:col-span-3 ">
         <thead class="mb-5 text-xl xl:text-2xl text-gray-400">
             <tr>
-                <th>نام درس</th>
+                <th colspan="2">نام درس</th>
                 <th>کد</th>
                 <th>تعداد واحد</th>
+                <th colspan="2">زمان و مکان</th>
             </tr>
         </thead>
-        <tbody class="text-2xl xl:text-4xl">
+        <tbody class="text-2xl">
             {#each data as item}
                 <tr style="height: 100px;">
-                    <td>
+                    <td colspan="2">
                         {toPersianNumbers(item.course_name)}
                     </td>
                     <td dir="ltr">
@@ -52,6 +53,9 @@
                     </td>
                     <td>
                         {toPersianNumbers(item.unit)}
+                    </td>
+                    <td class="text-base" colspan="2">
+                        {toPersianNumbers(item.lecture_location_and_time_info)}
                     </td>
                 </tr>
             {/each}
