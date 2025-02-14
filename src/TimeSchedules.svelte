@@ -1,8 +1,7 @@
 <script>
-	import axios from "axios";
 	import { onMount } from "svelte";
 	import MultiSelectDropDown from "./components/MultiSelectDropDown.svelte";
-	import { toPersianNumbers, API_URL, countHalfHours } from "./lib/helpers";
+	import { toPersianNumbers, API_URL, countHalfHours,api } from "./lib/helpers";
 	import { authStore, logout } from "./authStore";
 	import dayjs from "dayjs";
 	import utc from "dayjs/plugin/utc";
@@ -17,16 +16,23 @@
 	let last_scrape_datetime = $state(dayjs());
 	async function fetch_data() {
 		try {
-			const response = await axios.get(API_URL + "/data", {
-				headers: {
-					Authorization: `Bearer ${$authStore.token}`,
-				},
-			});
-			const response2 = await axios.get(API_URL + "/userCourses", {
-				headers: {
-					Authorization: `Bearer ${$authStore.token}`,
-				},
-			});
+			const [response, response2] = await Promise.all([
+				api.get(API_URL + "/data", {
+					cache:{
+						ttl:1000*60*5
+					},
+					headers: {
+						Authorization: `Bearer ${$authStore.token}`,
+                        'Cache-Control': 'public, max-age=60'
+					},
+				}),
+				api.get(API_URL + "/userCourses", {
+					cache:false,
+					headers: {
+						Authorization: `Bearer ${$authStore.token}`,
+					},
+				}),
+			]);
 			selected_courses = response2.data;
 			last_scrape_datetime = dayjs(
 				response.data[SCRAPE_DATETIME],
@@ -120,7 +126,8 @@
 	onMount(fetch_data);
 
 	async function remove_course(id) {
-		const response = await axios.put(API_URL + "/userCourses", [id], {
+		const response = await api.put(API_URL + "/userCourses", [id], {
+			cache:false,
 			headers: {
 				Authorization: `Bearer ${$authStore.token}`,
 			},
@@ -128,7 +135,8 @@
 		selected_courses = response.data;
 	}
 	async function add_course(id) {
-		const response = await axios.post(API_URL + "/userCourses", [id], {
+		const response = await api.post(API_URL + "/userCourses", [id], {
+			cache:false,
 			headers: {
 				Authorization: `Bearer ${$authStore.token}`,
 			},

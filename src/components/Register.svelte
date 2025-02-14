@@ -1,16 +1,17 @@
 <script>
     import { Link } from "svelte-routing";
     import { navigate } from "svelte-routing";
-    import { API_URL } from "../lib/helpers";
-    import axios from "axios";
+    import { API_URL,api } from "../lib/helpers";
     let username = $state("");
     let password = $state("");
     let errorMessage = "";
     async function handleRegister() {
         try {
-            const response = await axios.post(`${API_URL}/register`, {
+            const response = await api.post(`${API_URL}/register`, {
                 username,
                 password,
+            },{
+                cache:false
             });
 
             const data = response.data;

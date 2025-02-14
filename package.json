@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "axios": "^1.7.9",
+    "axios-cache-interceptor": "^1.6.2",
     "dayjs": "^1.11.13",
     "dayjs-plugin-utc": "^0.1.2",
     "jalaali-js": "^1.2.7",

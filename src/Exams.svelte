@@ -1,8 +1,7 @@
 <script>
     import jalaali from "jalaali-js";
-    import axios from "axios";
     import { onMount } from "svelte";
-    import { API_URL, countHalfHours, toPersianNumbers } from "./lib/helpers";
+    import { API_URL, countHalfHours, toPersianNumbers,api } from "./lib/helpers";
     import { authStore, logout } from "./authStore";
     import dayjs from "dayjs";
     import utc from "dayjs/plugin/utc";
@@ -81,16 +80,24 @@
     let last_scrape_datetime = $state(dayjs());
     async function fetch_data() {
         try {
-            const response = await axios.get(API_URL + "/data", {
-                headers: {
-                    Authorization: `Bearer ${$authStore.token}`,
-                },
-            });
-            const response2 = await axios.get(API_URL + "/userCourses", {
-                headers: {
-                    Authorization: `Bearer ${$authStore.token}`,
-                },
-            });
+            const [response, response2] = await Promise.all([
+				api.get(API_URL + "/data", {
+                    cache:{
+                        ttl:1000*60*5
+                    },
+					headers: {
+						Authorization: `Bearer ${$authStore.token}`,
+                        
+                        'Cache-Control': 'public, max-age=60'
+					},
+				}),
+				api.get(API_URL + "/userCourses", {
+					cache:false,
+                    headers: {
+						Authorization: `Bearer ${$authStore.token}`,
+					},
+				}),
+			]);
             selected_courses = response2.data;
             last_scrape_datetime = dayjs(
                 response.data[SCRAPE_DATETIME],
@@ -115,10 +122,6 @@
                         selected_courses.includes(a.course_number_and_group) &&
                         a.exam_date != "",
                 );
-            console.log(flat_data);
-            original_data = response.data.filter(
-                ([k, v]) => k != SCRAPE_DATETIME,
-            );
         } catch (err) {
             if (err.response && err.response.status === 401) {
                 logout();
@@ -167,8 +170,6 @@
         sortAndFillPersianDates(flat_data.map((item) => item.exam_date)),
     );
 </script>
-
-
 
 <div class="grid grid-cols-4" dir="rtl">
     <div class="col-span-4 md:col-span-1 px-5">
@@ -261,6 +262,6 @@
         </table>
     </div>
 </div>
-<style>
 
+<style>
 </style>

@@ -1,17 +1,18 @@
 <script>
     import { navigate } from "svelte-routing";
     import { login } from "../authStore";
-    import { API_URL } from "../lib/helpers";
-    import axios from "axios";
+    import { API_URL, api } from "../lib/helpers";
     import { Link } from "svelte-routing";
     let username = $state("");
     let password = $state("");
     let errorMessage = "";
     async function handleLogin() {
         try {
-            const response = await axios.post(`${API_URL}/login`, {
+            const response = await api.post(`${API_URL}/login`, {
                 username,
                 password,
+            },{
+                cache:false
             });
 
             const data = response.data;
@@ -24,7 +25,7 @@
             }
         } catch (err) {
             errorMessage = "An error occurred";
-            console.error(err); 
+            console.error(err);
         }
     }
 </script>

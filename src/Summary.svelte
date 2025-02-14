@@ -1,6 +1,10 @@
 <script>
-    import axios from "axios";
-    import { API_URL, countHalfHours, toPersianNumbers } from "./lib/helpers";
+    import {
+        API_URL,
+        countHalfHours,
+        toPersianNumbers,
+        api,
+    } from "./lib/helpers";
     import { authStore, logout } from "./authStore";
     import { onMount } from "svelte";
 
@@ -9,7 +13,8 @@
     let total_unit = $state(0);
     async function fetch_data() {
         try {
-            const response = await axios.get(API_URL + "/summary", {
+            const response = await api.get(API_URL + "/summary", {
+                cache: false,
                 headers: {
                     Authorization: `Bearer ${$authStore.token}`,
                 },
@@ -32,8 +37,8 @@
             مجموع واحد ها :‌<span>{toPersianNumbers(total_unit)}</span>
         </h2>
     </div>
-    
-    <table class="table  table-fixed  w-full col-span-4 xl:col-span-3 ">
+
+    <table class="table table-fixed w-full col-span-4 xl:col-span-3">
         <thead class="mb-5 text-xl xl:text-2xl text-gray-400">
             <tr>
                 <th colspan="2">نام درس</th>

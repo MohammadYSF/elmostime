@@ -1,3 +1,6 @@
+import axios from 'axios';
+import { setupCache } from 'axios-cache-interceptor';
+
 export function toPersianNumbers(num) {
     if (num.toString().trim().length == 0) return "";
     const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
@@ -17,4 +20,7 @@ export function countHalfHours(startTime, endTime) {
 
     return (endMinutes - startMinutes) / 15;
 }
+const instance = axios.create(); 
+export const api = setupCache(instance);
+
 export const API_URL = import.meta.env.VITE_API_URL;
