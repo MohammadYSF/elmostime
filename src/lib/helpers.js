@@ -8,8 +8,6 @@ export function toPersianNumbers(num) {
     return num.toString().replace(/\d/g, (d) => persianDigits[d]);
 }
 export function countHalfHours(startTime, endTime) {
-    console.log(startTime, "##", endTime);
-
     // Convert HH:MM to total minutes
     function timeToMinutes(time) {
         const [hours, minutes] = time.split(":").map(Number);

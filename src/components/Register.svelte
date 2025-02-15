@@ -16,7 +16,6 @@
             },
         });
         departments = response.data;
-        console.log(response.data);
     }
     onMount(fetch_data);
     async function handleRegister() {
