@@ -20,7 +20,12 @@ RUN npm run build
 FROM nginx:alpine
 
 # Copy built files from previous stage
-COPY --from=build /app/public /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
+
+
+COPY .well-known/acme-challenge/NaYRL5XDNW3pkyk6OmirEH3tqTZ4s3ufE4DVVBVu_ac.txt /usr/share/nginx/html/.well-known/acme-challenge/
+COPY .well-known/acme-challenge/SeiSO0Tx5J5gzT0wC4eTprA38-_MfdyrJIXrYzn0aWQ.txt /usr/share/nginx/html/.well-known/acme-challenge/
+
 
 # Expose port 80
 EXPOSE 80
